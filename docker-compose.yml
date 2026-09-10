@@ -1,0 +1,54 @@
+services:
+
+  db:
+    image: postgres:17-alpine
+    container_name: r2rml-postgres
+
+    environment:
+      POSTGRES_DB: toydb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d toydb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+  ontop:
+    image: ontop/ontop:5.5.0
+    container_name: r2rml-ontop
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    environment:
+      ONTOP_MAPPING_FILE: /opt/ontop/input/mapping.ttl
+      ONTOP_ONTOLOGY_FILE: /opt/ontop/input/ontology.ttl
+      ONTOP_PROPERTIES_FILE: /opt/ontop/input/database.properties
+
+      ONTOP_CORS_ALLOWED_ORIGINS: "*"
+
+      # Useful while experimenting:
+      ONTOP_DEV_MODE: "true"
+      ONTOP_LAZY_INIT: "true"
+
+    volumes:
+      - ./ontop:/opt/ontop/input:ro
+      - ./jdbc:/opt/ontop/jdbc:ro
+
+    ports:
+      - "8080:8080"
+
+
+volumes:
+  postgres_data:

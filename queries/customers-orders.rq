@@ -1,0 +1,12 @@
+PREFIX ex: <http://example.org/>
+
+SELECT ?customer ?name ?order ?amount
+WHERE {
+    ?customer a ex:Customer ;
+              ex:name ?name ;
+              ex:placedOrder ?order .
+
+    ?order a ex:Order ;
+           ex:amount ?amount .
+}
+ORDER BY ?name ?order

@@ -1,0 +1,116 @@
+@prefix rr:  <http://www.w3.org/ns/r2rml#> .
+@prefix ex:  <http://example.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+#################################################################
+# Customer mapping
+#################################################################
+
+<#CustomerMap>
+    a rr:TriplesMap ;
+
+    rr:logicalTable [
+        rr:tableName "customer"
+    ] ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/customer/{id}" ;
+        rr:class ex:Customer ;
+        rr:termType rr:IRI
+    ] ;
+
+
+    # customer.name -> ex:name
+
+    rr:predicateObjectMap [
+        rr:predicate ex:fullName ;
+
+        rr:objectMap [
+            rr:column "name"
+        ]
+    ] ;
+
+
+    # customer.email -> ex:email
+
+    rr:predicateObjectMap [
+        rr:predicate ex:email ;
+
+        rr:objectMap [
+            rr:column "email"
+        ]
+    ] ;
+
+
+    # customer.id -> orders.customer_id
+    #
+    # Creates:
+    #
+    # ex:customer/1 ex:placedOrder ex:order/101
+    # ex:customer/1 ex:placedOrder ex:order/102
+    #
+
+    rr:predicateObjectMap [
+        rr:predicate ex:placedOrder ;
+
+        rr:objectMap [
+            rr:parentTriplesMap <#OrderMap> ;
+
+            rr:joinCondition [
+                rr:child "id" ;
+                rr:parent "customer_id"
+            ]
+        ]
+    ] .
+
+
+#################################################################
+# Order mapping
+#################################################################
+
+<#OrderMap>
+    a rr:TriplesMap ;
+
+    rr:logicalTable [
+        rr:tableName "orders"
+    ] ;
+
+    rr:subjectMap [
+        rr:template "http://example.org/order/{id}" ;
+        rr:class ex:Order ;
+        rr:termType rr:IRI
+    ] ;
+
+
+    # orders.amount -> ex:amount
+
+    rr:predicateObjectMap [
+        rr:predicate ex:amount ;
+
+        rr:objectMap [
+            rr:column "amount" ;
+            rr:datatype xsd:decimal
+        ]
+    ] ;
+
+
+    # orders.customer_id -> customer.id
+    #
+    # Creates:
+    #
+    # ex:order/101 ex:customer ex:customer/1
+    #
+
+    rr:predicateObjectMap [
+        rr:predicate ex:customer ;
+
+        rr:objectMap [
+            rr:parentTriplesMap <#CustomerMap> ;
+
+            rr:joinCondition [
+                rr:child "customer_id" ;
+                rr:parent "id"
+            ]
+        ]
+    ] .

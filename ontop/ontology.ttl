@@ -1,0 +1,46 @@
+@prefix ex:   <http://example.org/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+
+# Classes
+
+ex:Customer
+    a owl:Class .
+
+ex:Order
+    a owl:Class .
+
+
+# Datatype properties
+
+ex:fullName
+    a owl:DatatypeProperty ;
+    rdfs:domain ex:Customer ;
+    rdfs:range xsd:string .
+
+ex:email
+    a owl:DatatypeProperty ;
+    rdfs:domain ex:Customer ;
+    rdfs:range xsd:string .
+
+ex:amount
+    a owl:DatatypeProperty ;
+    rdfs:domain ex:Order ;
+    rdfs:range xsd:decimal .
+
+
+# Object properties
+
+ex:placedOrder
+    a owl:ObjectProperty ;
+    rdfs:domain ex:Customer ;
+    rdfs:range ex:Order .
+
+ex:customer
+    a owl:ObjectProperty ;
+    rdfs:domain ex:Order ;
+    rdfs:range ex:Customer ;
+    owl:inverseOf ex:placedOrder .
